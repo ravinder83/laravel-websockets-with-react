@@ -1,0 +1,38 @@
+1- install -- composer require pusher/pusher-php-server (in laravel).
+2- setting up pusher envirinment variables and then setting option and clusters in config/broadcasting.php
+3- creating a new event (NewMessage.php) php artisan make:event NewMessage
+4- Run the following command to installing Laravel web-sockets
+    - composer require beyondcode/laravel-websockets
+    - php artisan vendor:publish --provider="BeyondCode\LaravelWebSockets\WebSocketsServiceProvider" --tag="migrations"
+    - php artisan migrate
+    - php artisan vendor:publish --provider="BeyondCode\LaravelWebSockets\WebSocketsServiceProvider" --tag="config"
+    - follow this blog - (https://beyondco.de/docs/laravel-websockets/getting-started/installation)
+    -After all these configuration we have to start laravel web socket server
+        php artisan websockets:serve
+        http://localhost:8000/laravel-websockets
+
+    - Do necessary set up in config/app.php , broadcasting.php , websockets.php files
+
+5- For-frontend
+    - install laravel-echo and pusher-js
+    - Then in App.js file
+        import Echo from "laravel-echo";
+        window.Pusher = require("pusher-js");
+        window.Echo = new Echo({
+            broadcaster: 'pusher',
+            key:process.env.REACT_APP_PUSHER_KEY,
+            wsHost: window.location.hostname,
+            wsPort: 6001,
+            wssport: 6001,
+            transports: ['websocket'],
+            enabledTransports: ['ws', 'wss'],
+            forceTLS: false,
+            disableStats: true,
+            cluster:"ap2"
+        })
+
+        - After setting up above configuration call / trigger event
+            window.Echo.channel('channel-message').listen('.all-messages', (response) => {
+                setMessage(response.data.data);
+            });
+
